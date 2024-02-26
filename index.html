@@ -8,14 +8,22 @@
 </head>
 <body>
 
-
+<!-- Color input for drawing -->
 <input onchange ="getThing()" type="color" id="C" class="C" value="#000000">
+
+<!-- Range input for adjusting stroke size -->
 <input onchange ="getThing()" type="range" min="1" max="200" id="S" class="S"value="6">
+
+<!-- Button to clear the canvas -->
 <input onclick ="clearAll()" type="button" id="B" class="B" >
 
+<!-- Buttons for undo functionality -->
 <input onclick="undo()" type="button" id="undoBtn" value="Undo">
+
+<!-- Buttons for redo functionality -->
 <input onclick="redo()" type="button" id="redoBtn" value="Redo">
 
+<!-- Buttons for save functionality -->
 <input onclick="saveImage()" type="button" id="saveBtn" value="Save Image">
 
 
@@ -24,111 +32,120 @@
 
 
 <script>
-var canvas = document.getElementById("canvas");
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-var ctx = canvas.getContext("2d");
-var undoStack = [], redoStack = [];
-var currentState;
+
+    // Getting canvas element and setting its size
+    var canvas = document.getElementById("canvas");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    var ctx = canvas.getContext("2d");
+
+    // Arrays to manage undo and redo functionality
+    var undoStack = [], redoStack = [];
+    var currentState;
 
 
+    // Function to get color and stroke size from inputs
+    function getThing() {
+        var getC = document.getElementById("C").value;
+        var getS = document.getElementById("S").value;
 
-function getThing() {
-	var getC = document.getElementById("C").value;
-	var getS = document.getElementById("S").value;
+        return {
+            getC, getS
+        };
+    }
 
-	return {
-		getC, getS
-	};
-}
+    // Function to clear the canvas
+    function clearAll(){
+        canvas.width = canvas.width;
+    }
 
+    // Function to draw on the canvas
+    function draw(e) {
+        if (drawing == false) return;
+        let editor = getThing();
+        ctx.lineWidth = editor.getS;
+        ctx.strokeStyle = editor.getC;	
+        ctx.lineCap ="round";
 
-function clearAll(){
-	canvas.width = canvas.width;
-}
+        var x = e.clientX || e.touches[0].clientX;
+        var y = e.clientY || e.touches[0].clientY;
 
-function draw(e) {
-	if (drawing == false) return;
-	let editor = getThing();
-	ctx.lineWidth = editor.getS;
-	ctx.strokeStyle = editor.getC;	
-	ctx.lineCap ="round";
+        ctx.lineTo(x, y);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(x, y);
 
-	var x = e.clientX || e.touches[0].clientX;
-    var y = e.clientY || e.touches[0].clientY;
+        saveState();
 
+    }
 
-	ctx.lineTo(e.clientX, e.clientY);
-	ctx.moveTo(e.clientX, e.clientY);
-	ctx.stroke();
+    // Function to start drawing on pointerdown event
+    function startDraw(e) {
+        drawing = true;
+        draw(e);
+    }
 
+    // Function to stop drawing on pointerup event
+    function overDraw() {
+        drawing = false;
+        ctx.beginPath();
+    }
 
-	saveState();
+    // Function to save the image as a PNG file
+    function saveImage() {
+        var image = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+        var link = document.createElement('a');
+        link.download = 'my-drawing.png';
+        link.href = image;
+        link.click();
+    }
 
-}
+    // Function to save the current state for undo/redo
+    function saveState() {
+        currentState = canvas.toDataURL();
+        undoStack.push(currentState);
+        redoStack = []; // Очистка redoStack, так как мы добавили новое действие
+    }
 
-function startDraw(e) {
-	drawing = true;
-	draw(e);
-}
-
-function overDraw() {
-	drawing = false;
-	ctx.beginPath();
-}
-
-function saveImage() {
-    var image = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
-    var link = document.createElement('a');
-    link.download = 'my-drawing.png';
-    link.href = image;
-    link.click();
-}
-
-
-function saveState() {
-    currentState = canvas.toDataURL();
-    undoStack.push(currentState);
-    redoStack = []; // Очистка redoStack, так как мы добавили новое действие
-}
-
-function undo() {
-    if (undoStack.length > 0) {
-        redoStack.push(undoStack.pop());
+    // Function to undo the last drawing action
+    function undo() {
         if (undoStack.length > 0) {
-            var previousState = undoStack[undoStack.length - 1];
+            redoStack.push(undoStack.pop());
+            if (undoStack.length > 0) {
+                var previousState = undoStack[undoStack.length - 1];
+                var img = new Image();
+                img.src = previousState;
+                img.onload = function() {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(img, 0, 0);
+                };
+            } else {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+        }
+    }
+
+    // Function to redo the last undone drawing action
+    function redo() {
+        if (redoStack.length > 0) {
+            var nextState = redoStack.pop();
+            undoStack.push(nextState);
             var img = new Image();
-            img.src = previousState;
+            img.src = nextState;
             img.onload = function() {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 ctx.drawImage(img, 0, 0);
             };
-        } else {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
         }
     }
-}
 
-function redo() {
-    if (redoStack.length > 0) {
-        var nextState = redoStack.pop();
-        undoStack.push(nextState);
-        var img = new Image();
-        img.src = nextState;
-        img.onload = function() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(img, 0, 0);
-        };
-    }
-}
+    // Event listeners for drawing on the canvas
+    canvas.addEventListener("pointerdown", startDraw);
+    canvas.addEventListener("pointerup", overDraw);
+    canvas.addEventListener("pointermove", draw);
 
-
-canvas.addEventListener("pointerdown", startDraw);
-canvas.addEventListener("pointerup", overDraw);
-canvas.addEventListener("pointermove", draw);
-
-// Disable gesture zooming on touch devices
-canvas.style.touchAction = 'none';
+    // Disable gesture zooming on touch devices
+    canvas.style.touchAction = 'none';
 
 </script>
 

@@ -12,6 +12,20 @@ html::-webkit-scrollbar {
     display: none;
 }
 
+.navbar {
+  width: 100%; /* Полная ширина */
+  background-color: grey; /* Серый фон */
+  padding: 10px 0; /* Отступ сверху и снизу */
+  box-sizing: border-box; /* Учет padding в общей ширине */
+  position: fixed; /* Фиксированное положение */
+  top: 0; /* Расположение вверху */
+  left: 0;
+  z-index: 1000; /* Поверх других элементов */
+  display: flex; /* Использование flexbox для выравнивания */
+  justify-content: space-around; /* Равномерное распределение элементов */
+  align-items: center; /* Вертикальное выравнивание элементов */
+}
+
 .button {
   background-color: green; /* Green background */
   height: 48px; /* Match cat image height */
@@ -27,22 +41,28 @@ html::-webkit-scrollbar {
   border-radius: 4px; /* Rounded corners */
 }
 
+/* Стили для инструментов рисования */
+.tools {
+  padding-top: 60px; /* Отступ сверху, чтобы не перекрывалось navbar */
+}
+
 #B, #undoBtn, #redoBtn, #saveBtn {
   width: auto; /* Width of the buttons is automatic, adjust as needed */
 }
 
 
+
 .S{
   position: fixed;
   left: 70%;
-  top: 1%;
+  top: 100px;
   width: 5%;
 }
 
 .C{
   position: fixed;
   left: 80%;
-  top: 1%;
+  top: 100px;
   width: 5%;
 
 }
@@ -65,7 +85,6 @@ html::-webkit-scrollbar {
   width: 48px; /* Ширина иконки */
   height: 48px; /* Высота иконки */
   animation: rotate 2s linear infinite;
-  position: absolute;
   top: 20px;
 }
 

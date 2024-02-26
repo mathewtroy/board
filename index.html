@@ -127,6 +127,8 @@ canvas.addEventListener("pointerdown", startDraw);
 canvas.addEventListener("pointerup", overDraw);
 canvas.addEventListener("pointermove", draw);
 
+// Disable gesture zooming on touch devices
+canvas.style.touchAction = 'none';
 
 </script>
 

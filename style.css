@@ -12,6 +12,26 @@ html::-webkit-scrollbar {
     display: none;
 }
 
+.button {
+  background-color: green; /* Green background */
+  height: 48px; /* Match cat image height */
+  border: none; /* Remove border */
+  color: white; /* Text color */
+  padding: 0 15px; /* Padding on the sides */
+  text-align: center; /* Center the text */
+  text-decoration: none; /* Remove text decoration */
+  display: inline-block; /* Allow buttons to sit side by side */
+  font-size: 16px; /* Text size */
+  margin: 4px 2px; /* Margin around buttons */
+  cursor: pointer; /* Pointer cursor on hover */
+  border-radius: 4px; /* Rounded corners */
+}
+
+#B, #undoBtn, #redoBtn, #saveBtn {
+  width: auto; /* Width of the buttons is automatic, adjust as needed */
+}
+
+
 .S{
   position: fixed;
   left: 70%;
@@ -27,10 +47,25 @@ html::-webkit-scrollbar {
 
 }
 
-/* .B{
-  position: fixed;
-  left: 90%;
-  top: 1%;
-  width: 5%;
 
-} */
+@keyframes rotate {
+  from {
+      transform: rotate(0deg);
+  }
+  to {
+      transform: rotate(360deg);
+  }
+}
+
+.container {
+  position: relative;
+}
+
+.rotating-icon {
+  width: 48px; /* Ширина иконки */
+  height: 48px; /* Высота иконки */
+  animation: rotate 2s linear infinite;
+  position: absolute;
+  top: 20px;
+}
+

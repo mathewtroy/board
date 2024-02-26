@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport"content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet"type="text/css"href="style.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" type="text/css" href="style.css">
 <title>Whiteboard</title>
 </head>
 <body>
@@ -12,10 +12,10 @@
 <input onchange ="getThing()" type="color" id="C" class="C" value="#000000">
 
 <!-- Range input for adjusting stroke size -->
-<input onchange ="getThing()" type="range" min="1" max="200" id="S" class="S"value="6">
+<input onchange ="getThing()" type="range" min="1" max="200" id="S" class="S" value="6">
 
 <!-- Button to clear the canvas -->
-<input onclick ="clearAll()" type="button" id="B" class="B" >
+<input onclick ="clearAll()" type="button" id="B" class="B" value="Clear" >
 
 <!-- Buttons for undo functionality -->
 <input onclick="undo()" type="button" id="undoBtn" value="Undo">
@@ -116,7 +116,7 @@
 
             var sound = document.getElementById("undoSound");
                 sound.play();
-                
+
             redoStack.push(undoStack.pop());
             if (undoStack.length > 0) {
                 var previousState = undoStack[undoStack.length - 1];

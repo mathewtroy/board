@@ -26,6 +26,9 @@
 <!-- Buttons for save functionality -->
 <input onclick="saveImage()" type="button" id="saveBtn" value="Save Image">
 
+<!-- Added audio file -->
+<audio id="undoSound" src="cursor.wav" preload="auto"></audio>
+
 
 <canvas id="canvas"></canvas>
 
@@ -110,6 +113,10 @@
     // Function to undo the last drawing action
     function undo() {
         if (undoStack.length > 0) {
+
+            var sound = document.getElementById("undoSound");
+                sound.play();
+                
             redoStack.push(undoStack.pop());
             if (undoStack.length > 0) {
                 var previousState = undoStack[undoStack.length - 1];

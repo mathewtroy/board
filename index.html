@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet"type="text/css"href="style.css">
+<title>Whiteboard</title>
+</head>
+<body>
+
+
+<input onchange ="getThing()" type="color" id="C" class="C" value="#000000">
+<input onchange ="getThing()" type="range" min="1" max="200" id="S" class="S"value="6">
+<input onclick ="clearAll()" type="button" id="B" class="B" >
+
+<input onclick="undo()" type="button" id="undoBtn" value="Undo">
+<input onclick="redo()" type="button" id="redoBtn" value="Redo">
+
+<input onclick="saveImage()" type="button" id="saveBtn" value="Save Image">
+
+
+<canvas id="canvas"></canvas>
+
+
+
+<script>
+var canvas = document.getElementById("canvas");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+var ctx = canvas.getContext("2d");
+var undoStack = [], redoStack = [];
+var currentState;
+
+
+
+function getThing() {
+	var getC = document.getElementById("C").value;
+	var getS = document.getElementById("S").value;
+
+	return {
+		getC, getS
+	};
+}
+
+
+function clearAll(){
+	canvas.width = canvas.width;
+}
+
+function draw(e) {
+	if (drawing == false) return;
+	let editor = getThing();
+	ctx.lineWidth = editor.getS;
+	ctx.strokeStyle = editor.getC;	
+	ctx.lineCap ="round";
+
+	var x = e.clientX || e.touches[0].clientX;
+    var y = e.clientY || e.touches[0].clientY;
+
+
+	ctx.lineTo(e.clientX, e.clientY);
+	ctx.moveTo(e.clientX, e.clientY);
+	ctx.stroke();
+
+
+	saveState();
+
+}
+
+function startDraw(e) {
+	drawing = true;
+	draw(e);
+}
+
+function overDraw() {
+	drawing = false;
+	ctx.beginPath();
+}
+
+function saveImage() {
+    var image = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+    var link = document.createElement('a');
+    link.download = 'my-drawing.png';
+    link.href = image;
+    link.click();
+}
+
+
+function saveState() {
+    currentState = canvas.toDataURL();
+    undoStack.push(currentState);
+    redoStack = []; // Очистка redoStack, так как мы добавили новое действие
+}
+
+function undo() {
+    if (undoStack.length > 0) {
+        redoStack.push(undoStack.pop());
+        if (undoStack.length > 0) {
+            var previousState = undoStack[undoStack.length - 1];
+            var img = new Image();
+            img.src = previousState;
+            img.onload = function() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 0, 0);
+            };
+        } else {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+    }
+}
+
+function redo() {
+    if (redoStack.length > 0) {
+        var nextState = redoStack.pop();
+        undoStack.push(nextState);
+        var img = new Image();
+        img.src = nextState;
+        img.onload = function() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, 0, 0);
+        };
+    }
+}
+
+
+canvas.addEventListener("pointerdown", startDraw);
+canvas.addEventListener("pointerup", overDraw);
+canvas.addEventListener("pointermove", draw);
+
+
+</script>
+
+</body>
+</html>
